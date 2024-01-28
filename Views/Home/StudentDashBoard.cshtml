@@ -1,0 +1,21 @@
+﻿@using SMS.Models;
+@model StudentDetails;
+
+
+<h2>This is Student Dashboard</h2>
+@* <h3>Welcome @User.Identity.Name</h3>
+@Model.IdentityUser.Email
+@Model.FathersName; *@
+<h3>Welcome @User.Identity.Name</h3>
+<div class="card" style="width: 18rem;">
+  <div class="card-body">
+        
+        <h5 class="card-title">@Model.IdentityUser.Email</h5>
+        <h5 class="card-title">@Model.FathersName</h5>
+        <h5 class="card-title">@Model.PhoneNumber</h5>
+        <h5 class="card-title">@Model.Address</h5>
+        
+        
+    
+  </div>
+</div>
