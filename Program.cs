@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SMS.StudentRepository;
 using SMS.SmsServices;
+using SMS.Email;
+using System.Configuration;
+using SMS.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +21,13 @@ builder.Services.ConfigureApplicationCookie(opt =>
     opt.AccessDeniedPath = "/Home/SignIn";
     opt.LoginPath = "/Home/SignIn";
 });
+//--------------------regsitering service for email---------
 
+// Register the email service
+builder.Services.AddTransient<IEmailService, MailKitEmailService>();
+
+// Configure email settings
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 
 //-----resgister services for sms services--------------
@@ -28,8 +37,9 @@ builder.Services.AddSingleton<ISmsService>(provider =>
     var accountSid = configuration["Twilio:AccountSid"];
     var authToken = configuration["Twilio:AuthToken"];
     var phoneNumber = configuration["Twilio:PhoneNumber"];
+    var messagingServiceSid = configuration["Twilio:MessagingServiceSid"];
 
-    return new TwilioSmsService(accountSid, authToken, phoneNumber);
+    return new TwilioSmsService(accountSid, authToken, messagingServiceSid,phoneNumber);
 });
 var app = builder.Build();
 

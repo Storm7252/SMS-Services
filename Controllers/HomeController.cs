@@ -1,13 +1,16 @@
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SMS.DatabaseContext;
+using SMS.Email;
 using SMS.Models;
 using SMS.SmsServices;
 using SMS.StudentRepository;
 using System.Diagnostics;
 using System.Security.Claims;
+using Twilio.TwiML.Messaging;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SMS.Controllers
@@ -19,13 +22,15 @@ namespace SMS.Controllers
         private readonly Irepo _sturepo;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly StudentContext _stucon;
+        private readonly IEmailService _emailService;
 
-        public HomeController(ISmsService smsService,Irepo sturepo,RoleManager<IdentityRole> roleManager,StudentContext stucon)
+        public HomeController(IEmailService emailService, ISmsService smsService,Irepo sturepo,RoleManager<IdentityRole> roleManager,StudentContext stucon)
         {
             this._smsService = smsService;
             _sturepo = sturepo;
             this.roleManager = roleManager;
             this._stucon = stucon;
+            _emailService = emailService;
         }
 
         public IActionResult Index()
@@ -104,13 +109,14 @@ namespace SMS.Controllers
                     return View(FormData);
                 }
                 ModelState.Clear();
-                try
+                _emailService.SendRegistrationEmail(FormData.Email, FormData.UserName);
+                _smsService.SendSms("+918899733348",$"{FormData.UserName}  has Created account in softStacks Pvt Ltd");
+               /* try
                 {
-                    _smsService.SendSms("+918899733348",$"{FormData.UserName}  has Created account in softStacks Pvt Ltd");
                 }catch(Exception ex)
                 {
                     return Content(ex.Message);
-                }
+                }*/
                
                 return RedirectToAction("SignIn");
             }
